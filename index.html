@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CertifyChain - Digital Certificate Verification</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --light: #f3f4f6;
+            --dark: #1f2937;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            color: #374151;
+        }
+        
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logo i {
+            color: var(--secondary);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero-content {
+            flex: 1;
+            padding-right: 2rem;
+        }
+        
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+        
+        .features {
+            background-color: white;
+            padding: 4rem 2rem;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .verify-section {
+            padding: 4rem 2rem;
+            background-color: var(--light);
+            text-align: center;
+        }
+        
+        .verify-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .verification-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .qr-upload-area {
+            border: 2px dashed #d1d5db;
+            padding: 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .verification-result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .verification-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .verification-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        .admin-panel {
+            display: none;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-content {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .admin-sidebar {
+            width: 250px;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-menu {
+            list-style: none;
+        }
+        
+        .admin-menu li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .admin-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 5px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: background-color 0.3s;
+        }
+        
+        .admin-menu a:hover,
+        .admin-menu a.active {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+        
+        .admin-main {
+            flex: 1;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .issue-certificate-form {
+            margin-top: 1.5rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+        
+        table th, table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        
+        .cert-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .view-btn {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+        
+        .revoke-btn {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .footer-links h3 {
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-links a {
+            color: #d1d5db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #4b5563;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-content {
+                padding-right: 0;
+                margin-bottom: 2rem;
+            }
+            
+            .admin-content {
+                flex-direction: column;
+            }
+            
+            .admin-sidebar {
+                width: 100%;
+            }
+            
+            nav ul {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+            <span>CertifyChain</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#verify">Verify Certificate</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <a href="#" class="btn btn-outline" id="login-btn">Login</a>
+            <a href="#" class="btn btn-primary" id="register-btn">Register</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Secure Digital Certificate Verification</h1>
+            <p>CertifyChain offers a tamper-proof blockchain-based solution for issuing, managing, and verifying digital certificates. Ensure the authenticity of academic credentials, professional certifications, and training achievements.</p>
+            <div class="hero-buttons">
+                <a href="#verify" class="btn btn-primary">Verify Certificate</a>
+                <a href="#" class="btn btn-outline">Issue Certificate</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="https://static.vecteezy.com/system/resources/previews/018/834/464/original/document-verification-user-authentication-success-clipboard-with-a-checkmark-illustration-free-vector.jpg" alt="Digital Certificate Verification">
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-title">
+            <h2>Why Choose CertifyChain?</h2>
+            <p>Our platform offers the most secure and efficient way to issue and verify digital certificates</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="feature-title">Tamper-Proof Security</h3>
+                <p>Blockchain technology ensures certificates cannot be altered or forged after issuance.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="feature-title">Instant Verification</h3>
+                <p>Verify certificates in seconds using our simple QR code or certificate ID system.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3 class="feature-title">Global Accessibility</h3>
+                <p>Access and verify certificates from anywhere in the world at any time.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="feature-title">Complete Audit Trail</h3>
+                <p>Track every certificate's issuance and verification history with timestamped records.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-list-alt"></i>
+                </div>
+                <h3 class="feature-title">Admin Dashboard</h3>
+                <p>Powerful tools for institutions to issue, manage, and monitor certificates.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Public Key Cryptography</h3>
+                <p>Advanced encryption ensures only authorized institutions can issue certificates.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verification Section -->
+    <section class="verify-section" id="verify">
+        <div class="section-title">
+            <h2>Verify Certificate</h2>
+            <p>Validate the authenticity of any certificate issued through our platform</p>
+        </div>
+        <div class="verify-container">
+            <div class="verification-tabs">
+                <div class="tab active" data-tab="id-verification">Certificate ID Verification</div>
+                <div class="tab" data-tab="qr-verification">QR Code Verification</div>
+            </div>
+            <div class="tab-content active" id="id-verification">
+                <form id="id-verification-form">
+                    <div class="form-group">
+                        <label for="certificate-id">Certificate ID</label>
+                        <input type="text" id="certificate-id" placeholder="Enter the certificate ID (e.g., CERT-123456)">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify Certificate</button>
+                </form>
+            </div>
+            <div class="tab-content" id="qr-verification">
+                <form id="qr-verification-form">
+                    <div class="form-group">
+                        <label for="qr-upload">Upload QR Code</label>
+                        <div class="qr-upload-area" id="qr-upload">
+                            <i class="fas fa-qrcode" style="font-size: 3rem; color: #d1d5db;"></i>
+                            <p>Click to upload or drag and drop a QR code image</p>
+                            <input type="file" id="qr-file" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify Certificate</button>
+                </form>
+            </div>
+            <div class="verification-result verification-success" id="success-result">
+                <i class="fas fa-check-circle"></i>
+                <h3>Certificate Verified Successfully</h3>
+                <div class="certificate-details">
+                    <p><strong>Certificate ID:</strong> <span id="cert-id"></span></p>
+                    <p><strong>Recipient:</strong> <span id="cert-recipient"></span></p>
+                    <p><strong>Issuing Institution:</strong> <span id="cert-issuer"></span></p>
+                    <p><strong>Issue Date:</strong> <span id="cert-date"></span></p>
+                    <p><strong>Certification:</strong> <span id="cert-title"></span></p>
+                    <p><strong>Blockchain Transaction:</strong> <span id="cert-transaction"></span></p>
+                </div>
+            </div>
+            <div class="verification-result verification-error" id="error-result">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Certificate Verification Failed</h3>
+                <p>The certificate could not be verified. It may be invalid, tampered with, or not exist in our system.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Panel (Hidden by default) -->
+    <section class="admin-panel" id="admin-panel">
+        <div class="admin-header">
+            <h2>Admin Dashboard</h2>
+            <div class="admin-actions">
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Issue New Certificate
+                </button>
+            </div>
+        </div>
+        <div class="admin-content">
+            <div class="admin-sidebar">
+                <ul class="admin-menu">
+                    <li>
+                        <a href="#" class="active">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-certificate"></i> Certificates
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-users"></i> Recipients
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-history"></i> Verification Logs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="admin-main">
+                <h3>Issue New Certificate</h3>
+                <form class="issue-certificate-form">
+                    <div class="form-group">
+                        <label for="recipient-name">Recipient Name</label>
+                        <input type="text" id="recipient-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="recipient-email">Recipient Email</label>
+                        <input type="text" id="recipient-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="certificate-title">Certificate Title</label>
+                        <input type="text" id="certificate-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issue-date">Issue Date</label>
+                        <input type="text" id="issue-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expiry-date">Expiry Date (Optional)</label>
+                        <input type="text" id="expiry-date">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Issue Certificate</button>
+                </form>
+                
+                <h3 style="margin-top: 2rem;">Recently Issued Certificates</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Certificate ID</th>
+                            <th>Recipient</th>
+                            <th>Title</th>
+                            <th>Issue Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CERT-123456</td>
+                            <td>Aryaman Sahu</td>
+                            <td>Web Development</td>
+                            <td>16-01-2024</td>
+                            <td>Active</td>
+                            <td class="cert-actions">
+                                <button class="action-btn view-btn">View</button>
+                                <button class="action-btn revoke-btn">Revoke</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>CERT-123457</td>
+                            <td>Anushka Modi</td>
+                            <td>Blockchain Fundamentals</td>
+                            <td>20-05-2024</td>
+                            <td>Active</td>
+                            <td class="cert-actions">
+                                <button class="action-btn view-btn">View</button>
+                                <button class="action-btn revoke-btn">Revoke</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>CERT-123458</td>
+                            <td>Sushma Patel</td>
+                            <td>Data Science Certification</td>
+                            <td>13-08-2024</td>
+                            <td>Active</td>
+                            <td class="cert-actions">
+                                <button class="action-btn view-btn">View</button>
+                                <button class="action-btn revoke-btn">Revoke</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>CERT-123458</td>
+                            <td>Mahi Kakkar</td>
+                            <td>Artificial Intelligence Markup Language </td>
+                            <td>28-12-2024</td>
+                            <td>Active</td>
+                            <td class="cert-actions">
+                                <button class="action-btn view-btn">View</button>
+                                <button class="action-btn revoke-btn">Revoke</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <i class="fas fa-shield-alt"></i> CertifyChain
+                </div>
+                <p>Providing secure and tamper-proof digital certificate solutions using blockchain technology.</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#verify">Verify Certificate</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API Reference</a></li>
+                    <li><a href="#">Blockchain Explorer</a></li>
+                    <li><a href="#">Knowledge Base</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>Contact</h3>
+                <ul>
+                    <li><a href="mailto:info@certifychain.com">info@certifychain.com</a></li>
+                    <li><a href="tel:+1234567890">+91 1234567890</a></li>
+                    <li> SATI, Vidisha</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 CertifyChain. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Remove active class from all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // QR upload area functionality
+        const qrUploadArea = document.getElementById('qr-upload');
+        const qrFileInput = document.getElementById('qr-file');
+        
+        qrUploadArea.addEventListener('click', () => {
+            qrFileInput.click();
+        });
+        
+        qrFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                qrUploadArea.innerHTML = `
+                    <p>Selected file: ${e.target.files[0].name}</p>
+                    <p>Click to change file</p>
+                `;
+            }
+        });
+        
+        // Form submission handlers (for demo purposes)
+        document.getElementById('id-verification-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const certificateId = document.getElementById('certificate-id').value;
+            
+            // Mock verification process
+            if (certificateId === 'CERT-123456') {
+                document.getElementById('cert-id').textContent = 'CERT-123456';
+                document.getElementById('cert-recipient').textContent = 'John Doe';
+                document.getElementById('cert-issuer').textContent = 'Tech University';
+                document.getElementById('cert-date').textContent = 'Apr 15, 2025';
+                document.getElementById('cert-title').textContent = 'Advanced Web Development';
+                document.getElementById('cert-transaction').textContent = '0x7c5a...3f12';
+                
+                document.getElementById('success-result').style.display = 'block';
+                document.getElementById('error-result').style.display = 'none';
+            } else {
+                document.getElementById('success-result').style.display = 'none';
+                document.getElementById('error-result').style.display = 'block';
+            }
+        });
+        
+        document.getElementById('qr-verification-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Mock QR verification (always fails in this demo)
+            document.getElementById('success-result').style.display = 'none';
+            document.getElementById('error-result').style.display = 'block';
+        });
+        
+        // Login functionality (mock)
+        document.getElementById('login-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            // Mock login - in a real app, this would check credentials
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.features').style.display = 'none';
+            document.querySelector('.verify-section').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            
+            // Change header buttons
+            document.querySelector('.auth-buttons').innerHTML = `
+                <span style="margin-right: 1rem;">Welcome, Admin</span>
+                <a href="#" class="btn btn-outline" id="logout-btn">Logout</a>
+            `;
+            
+            // Add logout functionality
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                location.reload();
+            });
+        });
+    </script>
+</body>
+</html>
